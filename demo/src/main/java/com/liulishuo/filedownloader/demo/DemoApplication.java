@@ -9,8 +9,6 @@ import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.liulishuo.filedownloader.util.FileDownloadLog;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
 
-import java.net.Proxy;
-
 import cn.dreamtobe.threaddebugger.IThreadDebugger;
 import cn.dreamtobe.threaddebugger.ThreadDebugger;
 import cn.dreamtobe.threaddebugger.ThreadDebuggers;
@@ -41,7 +39,6 @@ public class DemoApplication extends Application {
                         .Creator(new FileDownloadUrlConnection.Configuration()
                         .connectTimeout(15_000) // set connection timeout.
                         .readTimeout(15_000) // set read timeout.
-                        .proxy(Proxy.NO_PROXY) // set proxy
                 ))
                 .commit();
 
@@ -54,6 +51,8 @@ public class DemoApplication extends Application {
                         .add(FileDownloadUtils.getThreadPoolName("Flow"), "FlowSingle")
                         .add(FileDownloadUtils.getThreadPoolName("EventPool"), "Event")
                         .add(FileDownloadUtils.getThreadPoolName("LauncherTask"), "LauncherTask")
+                        .add(FileDownloadUtils.getThreadPoolName("ConnectionBlock"), "Connection")
+                        .add(FileDownloadUtils.getThreadPoolName("RemitHandoverToDB"), "RemitHandoverToDB")
                         .add(FileDownloadUtils.getThreadPoolName("BlockCompleted"), "BlockCompleted"),
 
                 2000, /** The frequent of Updating Thread Activity information **/

@@ -2,6 +2,114 @@
 
 > [中文迭代日志](https://github.com/lingochamp/FileDownloader/blob/master/CHANGELOG-ZH.md)
 
+## Version 1.7.6
+
+_2019-02-20_
+
+#### Fix
+
+- Fix: stop foreground service after all tasks finished in Android O. closes #1096
+- Fix: fix 'Context.startForegroundService() did not then call Service.startForeground()' issue. closes #1104
+- Fix: insure all foreground service running notification is canceled when pause download. closes #1136
+- Fix: fix tiny possibility npe during retry. closes #1100
+
+## Version 1.7.5
+
+_2018-08-03_
+
+#### Fix
+
+- Fix: fix raise "Not allowed to start service Intent..." issue when starting DownloadService on Android O and the application isn't on the foreground and also not on the whitelist, because we can't use `JobScheduler` to handle the download affair. closes #1078
+
+#### Enhance
+
+- Improve Practicability: support character set and the launguage encoding for `Content-Disposition`. closes #1057
+- Improve Practicability: cover the error response code 416 from aliyun repo. closes #1050
+
+## Version 1.7.4
+
+_2018-05-19_
+
+#### Fix
+
+- Fix: fix raise 'IllegalStateException' on Android 8+ when FileDownloader try to re-bind service after the connection with the service is lost on downloading state and the app is on the background. closes #1017
+- Fix: fix directory traversal vulnerability security issue. closes #1028
+
+## Version 1.7.3
+
+_2018-04-20_
+
+#### Fix
+
+Fix: fix `fd` isn't released manually when download finished which may raise oom when there are a large number of tasks that are continuously initiated.
+
+## Version 1.7.2
+
+_2018-03-14_
+
+#### Fix
+
+- Fix: do not download callback error when the instance length of the task is zero, callback complete directly instead. closes #789
+- Fix: fix the temp duplicate data in the database isn't removed when there is another running task with the same temp file path. closes #953
+- Fix: the data lost when retry. closes #949
+- Fix: fix the instance-length is always 1 when the Content-Range isn't provided but the Content-Length is provided on the trial connection.
+
+#### Enhancement
+
+- Improve Practicability: using the content length value on the Content-Range field when there isn't Content-Length field found in the response header. closes #967
+
+## Version 1.7.1
+
+_2018-02-05_
+
+#### Fix
+
+- Fix: fix download failed with 405 response code when backend can't support `HEAD` method. close #942
+
+## Version 1.7.0
+
+_2018-02-01_
+
+#### Fix
+
+- Fix: fix update status can't keep flow through making updating status synchronized with pause action. close #889
+- Fix: fix the sofar-bytes carry back through pending state callback has already discarded. close #884
+- Fix: fix can't find filename if filename value on content-disposition without around with ". close #908
+- Fix: correct `setCallbackProgressTimes` method make `setCallbackProgressTimes` work correctly. close #901
+- Fix: fix download useless data on tcp-window because of the first trial connection use `0-infinite` range. close #933
+- Fix: close intput stream when connection ending avoid input-stream leak especially for the trial connection.
+
+#### Enhancement
+
+- Improve Practicability: do not remove the temp-file if rename it to the target path success to prevent raise some file-system problem. close #912
+- Improve Practicability: discard range totally if range is right but backend response 416. close #921
+- Improve Performance: using HEAD request method instead of GET method for trial connect. ref #933
+
+#### Other
+
+If you are using filedownloader-okhttp3-connection, please upgrade it to the `1.1.0` to adapter FileDownloader 1.7.0.
+
+## Version 1.6.9
+
+_2017-12-16_
+
+#### Fix
+
+- Fix(serial-queue): fix deadlock on `FileDownloadSerialQueue`. closes #858
+- Fix: do not use j-unit on library non-unit-test env to fix the `no-static-method-found` issue on some mi-phones. closes #867
+- Fix: fix decrease two times of retry-chance each time of retry. closes #838
+- Fix: fix get status is pending when a task has been paused on pending status. closes #855
+
+#### Enhancement
+
+- Improve Practicability: public `SqliteDatabaseImpl`、`RemitDatabase`、`NoDatabaseImpl`, so you can overwrite them
+- Improve Practicability: support downgrade version from newer version
+- Improve Practicability: add the default `User-Agent` if upper layer does not add. closes #848
+- Improve Performance: change the keepalive second(5s to 15s) for each executor, since when downloading multiple tasks thread release and recreate too frequently
+- Improve Performance: using `RemitDatabase` instead of `DefaultFiledownloadDatabase` to avoid some small task start and finished on the very short time but consume too much time on sync status to database what is useless
+
+![][RemitDatabase-png]
+
 ## Version 1.6.8
 
 _2017-10-13_
@@ -816,5 +924,6 @@ _2015-12-22_
 
 - initial release
 
+[RemitDatabase-png]: https://github.com/lingochamp/FileDownloader/raw/master/art/remit-database.png
 [FileDownloadConnection-java-link]: https://github.com/lingochamp/FileDownloader/blob/master/library/src/main/java/com/liulishuo/filedownloader/connection/FileDownloadConnection.java
 [FileDownloadUrlConnection-java-link]: https://github.com/lingochamp/FileDownloader/blob/master/library/src/main/java/com/liulishuo/filedownloader/connection/FileDownloadUrlConnection.java

@@ -13,10 +13,8 @@ android {
     buildToolsVersion BUILD_TOOLS_VERSION as String
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion COMPILE_SDK_VERSION as int
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME as String
 
         File file = project.rootProject.file('local.properties');
         def needLog = null
@@ -46,12 +44,12 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    debugCompile 'cn.dreamtobe.threaddebugger:threaddebugger:1.3.3'
-    releaseCompile 'cn.dreamtobe.threaddebugger:threaddebugger-no-op:1.3.3'
-    compile project(':library')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    debugImplementation 'cn.dreamtobe.threaddebugger:threaddebugger:1.3.3'
+    releaseImplementation 'cn.dreamtobe.threaddebugger:threaddebugger-no-op:1.3.3'
+    implementation project(':library')
     // for testing
-    compile 'com.squareup.okio:okio:1.11.0'
+    implementation 'com.squareup.okio:okio:1.14.0'
 }

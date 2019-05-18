@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.liulishuo.filedownloader.services;
+package com.liulishuo.filedownloader.database;
 
 
 import com.liulishuo.filedownloader.model.ConnectionModel;
 import com.liulishuo.filedownloader.model.FileDownloadModel;
 import com.liulishuo.filedownloader.model.FileDownloadStatus;
-import com.liulishuo.filedownloader.util.FileDownloadHelper;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
 
 import java.util.List;
@@ -31,14 +30,21 @@ import java.util.List;
  * The data stored in the database is only used for task resumes from the breakpoint.
  * <p>
  * The task of the data stored in the database must be a task that has not finished downloading yet,
- * and if the task has finished downloading, its data will be {@link #remove(int)} from the database,
- * since that data is no longer available for resumption of its task pass.
+ * and if the task has finished downloading, its data will be {@link #remove(int)} from the
+ * database, since that data is no longer available for resumption of its task pass.
  *
- * @see DefaultDatabaseImpl
+ * @see SqliteDatabaseImpl
  * @see FileDownloadUtils#isBreakpointAvailable(int, FileDownloadModel)
  */
 @SuppressWarnings("UnusedParameters")
 public interface FileDownloadDatabase {
+
+    /**
+     * Invoked when task is started.
+     *
+     * @param id the download id.
+     */
+    void onTaskStart(final int id);
 
     /**
      * Find the model which identify is {@code id}.
@@ -119,11 +125,13 @@ public interface FileDownloadDatabase {
     void updateOldEtagOverdue(int id, String newEtag, long sofar, long total, int connectionCount);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#connected}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#connected}.
      *
      * @param id       the download id.
      * @param total    the new total bytes.
-     * @param etag     the new etag. this value will be {@code null} when we can't find it on response header.
+     * @param etag     the new etag. this value will be {@code null} when we can't find it on
+     *                 response header.
      * @param filename the new file name. this value will be {@code null} when its no need to store.
      */
     void updateConnected(int id, long total, String etag, String filename);
@@ -137,7 +145,8 @@ public interface FileDownloadDatabase {
     void updateProgress(int id, long sofarBytes);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#error}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#error}.
      *
      * @param id        the download id.
      * @param throwable the new exception.
@@ -146,7 +155,8 @@ public interface FileDownloadDatabase {
     void updateError(int id, Throwable throwable, long sofar);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#retry}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#retry}.
      *
      * @param id        the download id.
      * @param throwable the new exception.
@@ -154,7 +164,8 @@ public interface FileDownloadDatabase {
     void updateRetry(int id, Throwable throwable);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#completed}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#completed}.
      * The latest version will remove model from DB.
      *
      * @param id    the download id.
@@ -163,7 +174,8 @@ public interface FileDownloadDatabase {
     void updateCompleted(int id, final long total);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#paused}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#paused}.
      *
      * @param id    the download id.
      * @param sofar the new so far bytes.
@@ -171,25 +183,28 @@ public interface FileDownloadDatabase {
     void updatePause(int id, final long sofar);
 
     /**
-     * Update the data because of the download status alternative to {@link FileDownloadStatus#pending}.
+     * Update the data because of the download status alternative to
+     * {@link FileDownloadStatus#pending}.
      *
      * @param id the download id.
      */
     void updatePending(int id);
 
     /**
-     * Get the maintainer for the database, this maintainer will be used when the database is initializing.
+     * Get the maintainer for the database, this maintainer will be used when the database is
+     * initializing.
      * <p>
      * The maintainer will return all data on the database.
      * <p>
-     * Demo: {@link com.liulishuo.filedownloader.services.DefaultDatabaseImpl.Maintainer}
+     * Demo: {@link SqliteDatabaseImpl.Maintainer}
      *
      * @return the maintainer for maintain the database.
      */
     Maintainer maintainer();
 
     /**
-     * the maintainer for the database, this maintainer will be used when the database is initializing.
+     * the maintainer for the database, this maintainer will be used when the database is
+     * initializing.
      */
     @SuppressWarnings("EmptyMethod")
     interface Maintainer extends Iterable<FileDownloadModel> {
@@ -214,7 +229,8 @@ public interface FileDownloadDatabase {
 
         /**
          * invoke this method when the {@link FileDownloadModel#id} is changed because of the
-         * different {@link FileDownloadHelper.IdGenerator}, which generate the new id for the task.
+         * different {@link com.liulishuo.filedownloader.util.FileDownloadHelper.IdGenerator},
+         * which generate the new id for the task.
          * <p>
          * tips: you need to update the filedownloader-table and the connection-table.
          *

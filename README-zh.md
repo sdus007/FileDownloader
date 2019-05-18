@@ -5,6 +5,8 @@ Android 文件下载引擎，稳定、高效、灵活、简单易用
 [![Download][bintray_svg]][bintray_url]
 ![][file_downloader_svg]
 [![Build Status][build_status_svg]][build_status_link]
+[![][filedownloader_snapshot_svg]](https://oss.sonatype.org/content/repositories/snapshots/com/liulishuo/filedownloader/)
+
 
 > [README DOC](https://github.com/lingochamp/FileDownloader/blob/master/README.md)
 
@@ -13,6 +15,14 @@ Android 文件下载引擎，稳定、高效、灵活、简单易用
 #### 版本迭代日志: [Change Log](https://github.com/lingochamp/FileDownloader/blob/master/CHANGELOG.md)
 
 #### 英文文档: [Wiki](https://github.com/lingochamp/FileDownloader/wiki)、[优化建议](https://github.com/lingochamp/FileDownloader/wiki/Optimize-Tutorial)
+
+---
+
+### FileDownloader2 
+
+现在, [FileDownloader2-OkDownload](https://github.com/lingochamp/okdownload) 已经正式发布, okdownload继承了所有FileDownloader的优点，甚至做了更多的优化以及更多的特性。
+
+由于FileDownloader的单元测试覆盖太低，因此所有的进一步的需求以及提高都将会在okdownload上进行实现而非FileDownloader，而FileDownloader本身将只会关注于修复Bug。
 
 ---
 
@@ -34,12 +44,28 @@ Android 文件下载引擎，稳定、高效、灵活、简单易用
 
 ---
 
+## Android 系统适配
+
+### 适配 Android 8.0
+
+从 Android 8.0 开发，后台服务的限制增强了，可以参考[这里](https://developer.android.com/about/versions/oreo/background)了解更多信息。
+因此，自 FileDownloader 1.7.6 版本开始， Android 8.0 及之后的系统上，如果在后台启动下载服务，这个服务将会是一个前台服务，同时你会看到一个标题为 "FileDownloader" 的通知。
+你可以参考[这里](https://github.com/lingochamp/FileDownloader/wiki/Compatibility-of-Android-O-Servic)去自定义通知的内容。
+
+### 适配 Android 9.0
+
+从 Android 9.0 (API level 28) 开始，明文请求默认被禁止，你可以在[这里](https://stackoverflow.com/questions/45940861/android-8-cleartext-http-traffic-not-permitted)了解详细信息。
+FileDownloader 1.7.6 已经在 demo 中处理了此问题。
+
+根据[迁移笔记](https://developer.android.com/about/versions/pie/android-9.0-migration#tya)，`FOREGROUND_SERVICE` 这个权限已经在 1.7.6 版本添加到 library 的 manifest 里面了。
+
+---
+
 ## 欢迎提交 Pull requests
 
 - 尽量多的英文注解。
 - 每个提交尽量的细而精准。
 - Commit message 遵循: [AngularJS's commit message convention](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#-git-commit-guidelines)。
-- 尽可能的遵循IDE的代码检查建议(如 Android Studio 的 'Inspect Code')。
 
 ---
 
@@ -60,10 +86,18 @@ Android 文件下载引擎，稳定、高效、灵活、简单易用
 在项目中引用:
 
 ```groovy
-compile 'com.liulishuo.filedownloader:library:1.6.8'
+implementation 'com.liulishuo.filedownloader:library:1.7.6'
 ```
 
 > 如果是eclipse引入jar包参考: [这里](https://github.com/lingochamp/FileDownloader/issues/212#issuecomment-232240415)
+
+如果需要引入snapshot版本，请添加sonatype的仓库:
+
+```groovy
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+```
 
 #### 全局初始化
 
@@ -212,6 +246,9 @@ if (parallel) {
 //    );
 }
 
+// 最后你需要主动调用start方法来启动该Queue
+queueSet.start()
+
 // 串行任务动态管理也可以使用FileDownloadSerialQueue。
 ```
 
@@ -254,7 +291,7 @@ if (parallel) {
 
 | 方法名 | 需实现接口 | 已有组件 | 默认组件 | 说明
 | --- | --- | --- | --- | ---
-| database | FileDownloadDatabase | DefaultDatabaseImpl、NoDatabaseImpl | DefaultDatabaseImpl | 传入定制化数据库组件，用于存储用于断点续传的数据
+| database | FileDownloadDatabase | RemitDatabase、SqliteDatabaseImpl、NoDatabaseImpl | RemitDatabase | 传入定制化数据库组件，用于存储用于断点续传的数据
 | connection | FileDownloadConnection | FileDownloadUrlConnection | FileDownloadUrlConnection | 传入定制化的网络连接组件，用于下载时建立网络连接
 | outputStreamCreator | FileDownloadOutputStream | FileDownloadRandomAccessFile | FileDownloadRandomAccessFile | 传入输出流组件，用于下载时写文件使用
 | maxNetworkThreadCount | - | - | 3 | 传入创建下载引擎时，指定可用的下载线程个数
@@ -487,4 +524,5 @@ limitations under the License.
 [bintray_url]: https://bintray.com/jacksgong/maven/FileDownloader/_latestVersion
 [file_download_listener_callback_flow_png]: https://github.com/lingochamp/FileDownloader/raw/master/art/filedownloadlistener_callback_flow.png
 [build_status_svg]: https://travis-ci.org/lingochamp/FileDownloader.svg?branch=master
+[filedownloader_snapshot_svg]: https://img.shields.io/badge/SnapShot-1.7.7-yellow.svg
 [build_status_link]: https://travis-ci.org/lingochamp/FileDownloader

@@ -38,8 +38,9 @@ import com.liulishuo.filedownloader.util.DownloadServiceNotConnectedHelper;
  * the FileDownloader-Process through Binder.
  * <p/>
  * We will use this UIGuard as default, because the FileDownloadService runs in the separate process
- * `:filedownloader` as default, If you want to share the main process to run the FileDownloadService,
- * just add a command `process.non-separate=true` in `/filedownloader.properties`.
+ * `:filedownloader` as default, If you want to share the main process to run the
+ * FileDownloadService, just add a command `process.non-separate=true` in
+ * `/filedownloader.properties`.
  *
  * @see FileDownloadServiceSharedTransmit
  */
@@ -62,12 +63,16 @@ class FileDownloadServiceUIGuard extends
     }
 
     @Override
-    protected void registerCallback(IFileDownloadIPCService service, FileDownloadServiceCallback fileDownloadServiceCallback) throws RemoteException {
+    protected void registerCallback(IFileDownloadIPCService service,
+                                    FileDownloadServiceCallback fileDownloadServiceCallback)
+            throws RemoteException {
         service.registerCallback(fileDownloadServiceCallback);
     }
 
     @Override
-    protected void unregisterCallback(IFileDownloadIPCService service, FileDownloadServiceCallback fileDownloadServiceCallback) throws RemoteException {
+    protected void unregisterCallback(IFileDownloadIPCService service,
+                                      FileDownloadServiceCallback fileDownloadServiceCallback)
+            throws RemoteException {
         service.unregisterCallback(fileDownloadServiceCallback);
     }
 
@@ -77,6 +82,7 @@ class FileDownloadServiceUIGuard extends
         public void callback(MessageSnapshot snapshot) throws RemoteException {
             MessageSnapshotFlow.getImpl().inflow(snapshot);
         }
+
     }
 
     /**
@@ -102,7 +108,6 @@ class FileDownloadServiceUIGuard extends
                     isWifiRequired);
         } catch (RemoteException e) {
             e.printStackTrace();
-
             return false;
         }
 
@@ -244,6 +249,8 @@ class FileDownloadServiceUIGuard extends
             getService().stopForeground(removeNotification);
         } catch (RemoteException e) {
             e.printStackTrace();
+        } finally {
+            runServiceForeground = false;
         }
     }
 

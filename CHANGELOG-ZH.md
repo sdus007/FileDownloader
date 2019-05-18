@@ -2,6 +2,136 @@
 
 > [ Change log in english](https://github.com/lingochamp/FileDownloader/blob/master/CHANGELOG.md)
 
+## Version 1.7.6
+
+_2019-02-20_
+
+#### 修复
+
+- 修复: 在Android O以及更高版本手机上，在所有任务结束后自动将前台服务关闭. closes #1096
+- 修复: 修复'Context.startForegroundService() did not then call Service.startForeground()'的问题. closes #1104
+- 修复: 确保在调用停止任务后，运行中的通知被关闭. closes #1136
+- 修复: 修复在重试时小概率NPE. closes #1100
+
+## Version 1.7.5
+
+_2018-08-03_
+
+#### 修复
+
+- 修复: 修复在Android O的系统上，当应用不在前台，并且不在白名单的时候，由于下载服务无法通过`JobScheduler`来执行下载事务，只能通过`startService`，引起 "Not allowed to start service Intent..." 的问题。 closes #1078
+
+#### Enhance
+
+- 提升实用性: 支持`Content-Disposition`中的非UTF-8编码。 closes #1057
+- 提高实用性: 处理了阿里云服务错误反馈`416`的情况`。 closes #1050
+
+## Version 1.7.4
+
+_2018-05-19_
+
+#### 修复 
+
+- 修复: 修复在Android 8或更高版本上，当应用在后台时，并且此时正在下载，但是下载服务的链接断开，此时尝试重新绑定的时候发生'IllegalStateException'的问题。closes #1017
+- 修复: 修复响应头带回来的文件名可能存在安全隐患的问题. closes #1028
+
+## Version 1.7.3
+
+_2018-04-20_
+
+#### 修复
+
+修复: 修复由于在下载结束时`fd`没有被主动释放，导致当有大量的任务被不断的发起执行时有可能引发的OOM问题。
+
+## Version 1.7.2
+
+_2018-03-14_
+
+#### 修复
+
+- 修复: 将原本所需要下载的文件大小为`0`的时候，回调错误，修改为直接回调完成。closes #789
+- 修复: 修复当存在另外一个正在下载的相同临时文件路径的任务时，数据库中存在数据未被删除的问题。closes #953
+- 修复: 修复在重试后重试之前下载的进度丢失的问题。closes #949
+- 修复: 修复当试探连接没有提供`Content-Range`字段，但是提供`Content-Length`字段时，计算出的总长度始终是`1`的问题。
+
+#### 性能与提高
+
+- 提高实用性: 当在响应头中不存在`Content-Length`字段时，使用隐藏在`Content-Range`中的内容大小数据。 closes #967
+
+## Version 1.7.1
+
+_2018-02-05_
+
+#### 修复
+
+- 修复: 修复当后端不支持`HEAD`方法的时候，返回`405`响应状态导致下载失败的问题。 close #942
+
+## Version 1.7.0
+
+_2018-02-01_
+
+#### 修复
+
+- 修复: 通过同步处理暂停操作与状态的更新来修复状态不是一个正确向前的流的问题。 close #889
+- 修复: 修复在`pending`状态回调时带回来已经被弃用的`sofar-bytes`。 close #884
+- 修复: 修复当`filename`没有用`"`包裹时，无法通过`content-dispostion`获取文件名的问题。 close #908
+- 修复: 修正`setCallbackProgressTimes`设置的次数不能正常生效的问题。 close #901
+- 修复: 修复由于试探连接采用`0-infinite`的`Range`导致下载了无用内容到tcp-window的问题。close #933
+- 修复: 在连接`ending`的时候再次主动关闭输入流，防止输入流泄漏特别是对于试探连接来说。
+
+#### 性能与提高
+
+- 提高实用性: 当临时文件重命名为目标文件成功时，不再做一次移除临时文件的操作，防止一些文件系统报错的问题。close #912
+- 提高实用性: 当确定本地提供的`Range`是正确的，但是后端却返回`416`时，将完全弃用`Range`请求头。close #921
+- 提高性能: 为试探连接使用`HEAD`的请求替代`GET`方法，提高试探通信效率。 ref #933
+
+#### 其他
+
+如果你正在使用`filedownloader-okhttp3-connection`，请将其更新到`1.1.0`版本来适配`1.7.0`版本。 
+
+## Version 1.6.9
+
+_2017-12-16_
+
+#### 修复
+
+- 修复(serial-queue): 修复在`FileDownloadSerialQueue`遇到的死锁。 closes #858
+- 修复: 不再在非单元测试环境使用`j-unit`，避免在一些小米手机上发生`no-static-method-found`的问题。 closes #867
+- 修复: 修复每次重试减少两次重试机会的问题。 closes #838
+- 修复: 修复在`pending`的时候暂停任务，而后获取到该任务都是`pending`的状态的问题。 closes #855
+
+#### 性能与提高
+
+- 提高实用性: 开放`SqliteDatabaseImpl`、`RemitDatabase`、`NoDatabaseImpl`，便于上层覆盖他们。
+- 提高实用性: 支持从更高的版本降级到该版本。
+- 提高实用性: 当上层没有主动添加`User-Agent`的时候，内部添加默认的`User-Agent`。 closes #848
+- 提高性能: 修改所有的线程池中线程的存活时间(从5s修改为15s)，避免在高频下载中，各池子频繁的释放与创建线程
+- 提高性能: 使用`RemitDatabase`作为默认的数据库，在很多小任务很快的结束下载(2s内)，其数据库操作将会变得十分冗余，而这部分的数据库操作将被取消
+
+#### RemitDatabase
+
+FileDownloader中大多数数据库长尾问题，是由于有很多很小的任务同时执行：
+
+- 由于很小的任务每次启动、等待、连接、下载进度、结束都会促发入库
+- 一旦任务很小网速很快的时候，一个小任务实际下载耗时可能在1-2s完成
+- 因此整个引擎不得不为该1-2s完成的任务完成一连串的数据库入库、更新到从数据库删除的操作
+- 也就是说单个类似的任务在1-2s内促发了至少5次数据库操作，期间包含入库与最后的删除
+- 一个任务还好，当这样的任务数上升到几百个的层面，这样高频持续的数据库操作，就很容易暴露各种数据库问题（包含文件系统问题）
+- 而现有体系在上层推任务大量任务到下载服务的时候， 会高频持续的3个并行对这些任务做入库处理，在这个点上数据库问题也容易发生（包含文件系统问题）
+
+---
+
+而相比之下写入数据库是为了断点续传，这个短期的频繁数据库操作，实质的作用甚微，早期的提供外接接口来控制下载进度间的入库频率显然无法覆盖该问题。
+
+---
+
+因此，还是为FileDownloader推出新的`RemitDatabase`用于解决该问题，除去期间的多线程安全问题的处理，核心思想如下:
+![][RemitDatabase-png]
+
+- 如果某一个任务的整体数据更新与结束在2s(该值可定制)内，则不再有数据库操作，全程只存内存
+- 如果某一个任务的数据更新与结束操过2s，则分为两部分，2s前只存内存，2s开始同时存内存与数据库
+- 如果某一个任务最终的结束是暂停或错误，则在最后的状态更新中，同时存内存与数据库
+
 ## Version 1.6.8
 
 _2017-10-13_
@@ -811,5 +941,6 @@ _2015-12-22_
 
 - initial release
 
+[RemitDatabase-png]: https://github.com/lingochamp/FileDownloader/raw/master/art/remit-database.png
 [FileDownloadConnection-java-link]: https://github.com/lingochamp/FileDownloader/blob/master/library/src/main/java/com/liulishuo/filedownloader/connection/FileDownloadConnection.java
 [FileDownloadUrlConnection-java-link]: https://github.com/lingochamp/FileDownloader/blob/master/library/src/main/java/com/liulishuo/filedownloader/connection/FileDownloadUrlConnection.java
